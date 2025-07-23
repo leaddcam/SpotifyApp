@@ -15,3 +15,31 @@ export async function startAuth() {
         throw err;
     }
 }
+
+// henter auth code fra url for å få access token 
+export function getAuthCode() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('code');
+}
+
+// bruker code for å få access token
+export async function fetchAccessToken(code) {
+    try {
+        const res = await fetch(`${BASE_URL}/get-token`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({code})
+        });
+
+        if (!res.ok) throw new Error('Failed to fetch access token');
+        const data = await res.json();
+
+        localStorage.setItem('acces_token', data.access_token);
+        localStorage.setItem('refresh_token', data.refresh_token);
+
+        return data;
+    } catch (err) {
+        console.error('Error fetching access token: ', err);
+        throw err;
+    }
+}
