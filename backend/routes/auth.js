@@ -56,4 +56,33 @@ router.post('/get-token', async (req, res) => {
     }
 });
 
+
+// refreshing the token after 1 hour
+router.post('/refresh-token', async (req, res) => {
+    const { refresh_token } = req.body;
+    if (!refresh_token) return res.status(400).json({ error: 'Missing refresh token' });
+
+    try {
+        const params = new URLSearchParams();
+        params.append('grant_type', 'refresh_token');
+        params.append('refresh_token', refresh_token);
+
+        const authHeader = Buffer.from(`${client_id}:${client_secret}`).toString('base64');
+
+        const response = await axios.post(token_url, params, {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': `Basic ${authHeader}`
+            }
+        });
+
+        const { access_token, expires_in } = response.data;
+        res.json({ access_token, expires_in });
+
+    } catch (err) {
+        console.error('Failed to refresh token: ', err.response?.data || err.message);
+        res.status(500).json({ error: 'Failed to refresh token' });
+    }
+});
+
 module.exports = router;

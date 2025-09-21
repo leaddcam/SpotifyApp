@@ -4,6 +4,7 @@ import { getAuthCode, fetchAccessToken } from '../api/auth';
 function Home() {
   useEffect(() => {
     const code = getAuthCode();
+    console.log(code);
 
     if (code) {
       fetchAccessToken(code)
@@ -22,7 +23,7 @@ function Home() {
   return (
     <div>
       <h1>Velkommen!</h1>
-      <p>Du er logget inn med Spotify 🎵</p>
+      <p>Du er logget inn med Spotify </p>
     </div>
   );
 }

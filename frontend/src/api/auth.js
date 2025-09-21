@@ -1,6 +1,4 @@
-//
-// kommuniserer med backend router auth.js på http://localhost:3000/auth
-//
+
 const BASE_URL = 'http://localhost:3000/auth';
 
 // henter login-url fra backend og tar bruker til Spotifys innloggingssides
@@ -40,6 +38,28 @@ export async function fetchAccessToken(code) {
         return data;
     } catch (err) {
         console.error('Error fetching access token: ', err);
+        throw err;
+    }
+}
+
+// refreshing the token
+export async function refreshAccessToken() {
+    const refresh_token = localStorage.getItem('refresh_token');
+    if (!refresh_token) throw new Error('No refresh token stored');
+
+    try {
+        const res = await fetch(`${BASE_URL}/refresh-token`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh_token })
+        });
+
+        if (!res.ok) throw new Error('Failed to refresh token');
+        const { access_token } = await res.json();
+        localStorage.setItem('acces_token', access_token);
+        return access_token;
+    } catch (err) {
+        console.error('Error refreshing token:', err);
         throw err;
     }
 }
